@@ -1,5 +1,5 @@
 {
-  "name": "turbo-repo",
+  "name": "event-management",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -9,8 +9,7 @@
   },
   "devDependencies": {
     "prettier": "^3.2.5",
-    "turbo": "^2.2.3",
-    "typescript": "5.5.4"
+    "turbo": "^2.2.3"
   },
   "engines": {
     "node": ">=18"
