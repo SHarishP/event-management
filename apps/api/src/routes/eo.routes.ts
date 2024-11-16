@@ -1,9 +1,12 @@
 import { Router } from "express";
+import { EoLogin, EoRegister, GetEoDatas } from "../controllers/eo.controller";
 
 const router = Router();
 
-router.post("/eo-regist");
+router.post("/registration", EoRegister);
 
-router.get("/eo-data");
+router.get("/eo-list", GetEoDatas);
+
+router.post("/login", EoLogin);
 
 export default router;
