@@ -1,7 +1,7 @@
 import express, { Request, Response, Application } from "express";
 import { BASE_WEB_URL, PORT as port } from "./config/envConfig";
 import cors from "cors";
-import ErrorMiddleware from "./middleware/error.middleware";
+import ErrorMiddleware from "./middlewares/error.middleware";
 import eoRouter from "./routes/eo.routes";
 import eventRouter from "./routes/event.routes";
 import custRouter from "./routes/cust.routes";
