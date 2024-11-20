@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { VerifyEoToken } from "../middlewares/eo.middleware";
+import { VerifyEoToken } from "../middleware/eo.middleware";
 import { CreateEvent, GetMyEvents } from "../controllers/event.controller";
 
 const router = Router();
