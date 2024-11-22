@@ -32,6 +32,7 @@ export default function Navbar() {
           <div className="w-6 h-0.5 bg-black"></div>
         </button>
 
+
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center">
           <button className="hover:bg-blue-500 mx-4">Find Events</button>
