@@ -13,7 +13,7 @@ export default function BannerHome() {
         
       </div>
 
-      <div className="relative z-10 flex items-center justify-center h-full bg-black bg-opacity-60">
+      <div className="relative z-10 flex items-center justify-center h-full bg-white bg-opacity-25">
         <div className="text-center text-black p-4 md:text-center">
          <p className="text-2xl md:text-5xl font-bold">
          Benner Upcoming Event
