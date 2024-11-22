@@ -14,13 +14,4 @@ router.get("/eo-list", GetEoDatas);
 
 router.post("/login", LoginValidation, EoLogin);
 
-
-const router = Router();
-
-router.post("/registration", EoRegister);
-
-router.get("/eo-list", GetEoDatas);
-
-router.post("/login", EoLogin);
-
 export default router;

@@ -14,28 +14,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Company Column
-          <div className="w-full md:w-1/4 mb-8 md:mb-0">
-            <h3 className="text-white font-semibold mb-4">COMPANY</h3>
-            <ul>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Log In
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Sign Up
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Create Event
-                </a>
-              </li>
-            </ul>
-          </div> */}
-
           {/*Legal Column  */}
           <div className="w-full md:w-1/4">
             <h3 className="text-white font-semibold mb-4">MORE FROM US</h3>
@@ -56,7 +34,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="/eo-regist" className="hover:text-white">
                   Create Event Here!
                 </a>
               </li>

@@ -39,7 +39,7 @@ export default function Navbar() {
       <div>
         <button className="hover:bg-blue-500 mx-4">Login</button>
         <button className="bg-blue-800 p-2 px-5 text-white rounded-full hover:bg-blue-300 mx-4">
-          Sign Up
+          <a href="/signup">Sign Up</a>
         </button>
       </div>
     </div>
