@@ -29,7 +29,7 @@ const validationMessage: IValidationMessage = {
   },
 };
 
-const Schema = object({
+const RegisterSchema = object({
   name: string()
     .min(3, validationMessage.name.length)
     .max(30, validationMessage.name.length)
@@ -45,4 +45,11 @@ const Schema = object({
     ),
 });
 
-export default Schema;
+const LoginSchema = object({
+  email: string()
+    .email(validationMessage.email.isEmail)
+    .required(validationMessage.email.notEmpty),
+  password: string().required(validationMessage.password.notEmpty),
+});
+
+export { RegisterSchema, LoginSchema };
