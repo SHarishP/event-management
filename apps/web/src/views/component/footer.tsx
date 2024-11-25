@@ -1,6 +1,18 @@
+"use client";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
+import LoginModal from "./login/login";
+import { useState } from "react";
+import useAuthStore from "@/stores/auth-store";
+import { useRouter } from "next/navigation";
 
 export default function Footer() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const [loginOpen, setLoginOpen] = useState<boolean>(false);
+  const loginMenu = () => {
+    setLoginOpen(true);
+  };
+
   return (
     <footer className="bg-[#21003A] text-gray-300 py-12 w-full">
       <div className="px-8 lg:px-16">
@@ -10,7 +22,8 @@ export default function Footer() {
             <h2 className="text-3xl font-bold text-white mb-4">EventMinpro.</h2>
             <p className="mb-4">
               Purchase with us and we will ensure a seamless experience for you.
-              What are you waiting for? Book your events on Nama-web-event today!
+              What are you waiting for? Book your events on Nama-web-event
+              today!
             </p>
           </div>
 
@@ -34,9 +47,25 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/eo-regist" className="hover:text-white">
-                  Create Event Here!
-                </a>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (user) {
+                        router.push("/create-event");
+                      } else {
+                        loginMenu();
+                      }
+                    }}
+                  >
+                    Create Event Here!
+                  </button>
+                  <LoginModal
+                    LoginOpen={loginOpen}
+                    LoginClose={() => setLoginOpen(false)}
+                    Link="/eo-regist"
+                  />
+                </div>
               </li>
             </ul>
           </div>

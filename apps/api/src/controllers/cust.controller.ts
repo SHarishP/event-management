@@ -47,6 +47,46 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// Register eo to database
+async function EoRegist(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if email already exist
+    const findEo = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (findEo) throw new Error("Email already exist");
+
+    // Register with fixed role is "eo"
+    const findRoleEo = await prisma.role.findUnique({
+      where: { name: "eo" },
+    });
+    if (!findRoleEo) throw new Error("Role doesn't exist!");
+
+    const salt = await genSalt(10);
+    const hashPassword = await hash(password, salt);
+
+    await prisma.$transaction(async (prisma) => {
+      const newEo = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashPassword,
+          roleID: findRoleEo.id,
+        },
+      });
+
+      res.status(200).send({
+        message: "EO registration success",
+        data: newEo,
+      });
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Get All Cust Data
 async function GetCustDatas(req: Request, res: Response, next: NextFunction) {
   try {
@@ -63,6 +103,29 @@ async function GetCustDatas(req: Request, res: Response, next: NextFunction) {
     res.status(200).send({
       message: "Success",
       custDatas,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Get All Eo Data
+async function GetEoDatas(req: Request, res: Response, next: NextFunction) {
+  try {
+    const findRoleEo = await prisma.role.findUnique({
+      where: { name: "eo" },
+    });
+    const eoDatas = await prisma.user.findMany({
+      where: { roleID: findRoleEo?.id },
+      select: {
+        name: true,
+        email: true,
+      },
+    });
+
+    res.status(200).send({
+      message: "Success",
+      eoDatas,
     });
   } catch (err) {
     next(err);
@@ -104,4 +167,4 @@ async function CustLogin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { CustRegist, GetCustDatas, CustLogin };
+export { CustRegist, EoRegist, GetCustDatas, GetEoDatas, CustLogin };
