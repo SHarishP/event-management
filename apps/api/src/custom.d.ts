@@ -1,4 +1,4 @@
-export type EoUser = {
+export type User = {
   email: string;
   name: string;
   role: string;
@@ -7,7 +7,7 @@ export type EoUser = {
 declare global {
   namespace Express {
     export interface Request {
-      eoUser?: EoUser;
+      user?: User;
     }
   }
 }

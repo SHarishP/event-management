@@ -26,7 +26,6 @@ const HandleLogin = async (onAuthSuccess: (user: IUser | null) => void) => {
     if (access_token) {
       const user: IUser = jwtDecode(access_token);
       onAuthSuccess(user);
-      console.log(user.role);
     }
   } catch (err) {
     deleteCookie("access_token");
@@ -43,7 +42,7 @@ export default function LoginModal({
   const router = useRouter();
   const login = async (params: ILogin) => {
     try {
-      const { data } = await axiosInstance.post("/cust/login", params);
+      const { data } = await axiosInstance.post("/user/login", params);
       await HandleLogin(onAuthSuccess);
     } catch (err) {
       ErrorHandler(err);

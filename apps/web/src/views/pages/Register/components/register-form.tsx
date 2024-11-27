@@ -13,7 +13,7 @@ export function EoRegist() {
   //
   const register = async (params: IRegister) => {
     try {
-      const { data } = await axiosInstance.post("/cust/eo-regist", params);
+      const { data } = await axiosInstance.post("/user/eo-regist", params);
       console.log(data);
 
       Swal.fire({
@@ -122,7 +122,7 @@ export function CustRegist() {
   //
   const register = async (params: IRegister) => {
     try {
-      const { data } = await axiosInstance.post("/cust/cust-regist", params);
+      const { data } = await axiosInstance.post("/user/cust-regist", params);
       console.log(data);
 
       Swal.fire({
