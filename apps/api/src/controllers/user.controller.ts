@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { compare, genSalt, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { SECRET_KEY } from "../config/envConfig";
+import { join } from "path";
+import { User } from "../custom";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +29,9 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
+    // Path to default avatar
+    const defaultAvatarPath = join("/avatar", "default-avatar.jpg");
+
     // Input cust data to database
     await prisma.$transaction(async (prisma) => {
       const newCust = await prisma.user.create({
@@ -35,6 +40,7 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
           email,
           password: hashPassword,
           roleID: findRoleCust.id,
+          avatar: "AVT_default.jpg",
         },
       });
       res.status(200).send({
@@ -67,6 +73,9 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
+    // Path to default avatar
+    const defaultAvatarPath = join("/avatar", "default-avatar.jpg");
+
     await prisma.$transaction(async (prisma) => {
       const newEo = await prisma.user.create({
         data: {
@@ -74,6 +83,7 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
           email,
           password: hashPassword,
           roleID: findRoleEo.id,
+          avatar: "AVT_default.jpg",
         },
       });
 
@@ -167,4 +177,30 @@ async function CustLogin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { CustRegist, EoRegist, GetCustDatas, GetEoDatas, CustLogin };
+async function UpdateAvatar(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email } = req.user as User;
+    const { file } = req;
+    if (!file) {
+      throw new Error("No file uploaded");
+    }
+    await prisma.user.update({
+      where: { email },
+      data: { avatar: file?.filename },
+    });
+    res.status(200).send({
+      message: "Avatar updated successfully!",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export {
+  CustRegist,
+  EoRegist,
+  GetCustDatas,
+  GetEoDatas,
+  CustLogin,
+  UpdateAvatar,
+};
