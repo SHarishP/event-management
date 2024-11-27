@@ -2,10 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { compare, genSalt, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { SECRET_KEY } from "../config/envConfig";
-import { join } from "path";
+import { SECRET_KEY, BASE_WEB_URL } from "../config/envConfig";
 import { User } from "../custom";
 import { PORT as port } from "../config/envConfig";
+import { transporter } from "../lib/mail";
+import path from "path";
+import handlebars from "handlebars";
+import fs from "fs";
 
 const PORT = Number(port) || 8000;
 const prisma = new PrismaClient();
@@ -31,12 +34,17 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
-    // Path to default avatar
-    const defaultAvatarPath = join("/avatar", "default-avatar.jpg");
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "register-mail.hbs"
+    );
+    const templateSource = await fs.readFileSync(templatePath, "utf-8");
+    const compiledTemplate = handlebars.compile(templateSource);
 
     // Input cust data to database
     await prisma.$transaction(async (prisma) => {
-      const newCust = await prisma.user.create({
+      await prisma.user.create({
         data: {
           name,
           email,
@@ -45,10 +53,29 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
           avatar: "AVT_default.jpg",
         },
       });
-      res.status(200).send({
-        message: "Customer registration success",
-        data: newCust,
-      });
+    });
+
+    const payload = {
+      email,
+    };
+    const token = sign(payload, SECRET_KEY as string, { expiresIn: "1hr" });
+
+    const verificationUrl = BASE_WEB_URL + `/verify/${token}`;
+
+    const html = compiledTemplate({
+      email: email,
+      name: name,
+      verificationUrl,
+    });
+
+    await transporter.sendMail({
+      to: email,
+      subject: "Welcome to our website",
+      html,
+    });
+
+    res.status(200).send({
+      message: "Customer registration success",
     });
   } catch (err) {
     next(err);
@@ -75,9 +102,6 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
-    // Path to default avatar
-    const defaultAvatarPath = join("/avatar", "default-avatar.jpg");
-
     await prisma.$transaction(async (prisma) => {
       const newEo = await prisma.user.create({
         data: {
@@ -88,11 +112,16 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
           avatar: "AVT_default.jpg",
         },
       });
+    });
 
-      res.status(200).send({
-        message: "EO registration success",
-        data: newEo,
-      });
+    await transporter.sendMail({
+      to: email,
+      subject: "Welcome to our website",
+      // html,
+    });
+
+    res.status(200).send({
+      message: "EO registration success",
     });
   } catch (err) {
     next(err);
