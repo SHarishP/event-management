@@ -5,7 +5,9 @@ import { sign } from "jsonwebtoken";
 import { SECRET_KEY } from "../config/envConfig";
 import { join } from "path";
 import { User } from "../custom";
+import { PORT as port } from "../config/envConfig";
 
+const PORT = Number(port) || 8000;
 const prisma = new PrismaClient();
 
 // Register customer to database
@@ -108,6 +110,7 @@ async function GetCustDatas(req: Request, res: Response, next: NextFunction) {
       select: {
         name: true,
         email: true,
+        avatar: true,
       },
     });
     res.status(200).send({
@@ -166,6 +169,7 @@ async function CustLogin(req: Request, res: Response, next: NextFunction) {
       email,
       name: findCust.name,
       role: findCust.role.name,
+      avatar: findCust.avatar,
     };
     const custToken = sign(payload, SECRET_KEY as string, { expiresIn: "1d" });
 
@@ -196,6 +200,22 @@ async function UpdateAvatar(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function GetAvatar(req: Request, res: Response, next: NextFunction) {
+  try {
+    const email = req.query.email as string;
+    const findAvatar = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        avatar: true,
+      },
+    });
+    const avatarPath = `http://localhost:${PORT}/public/avatar/${findAvatar?.avatar}`;
+    res.status(200).json(avatarPath);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export {
   CustRegist,
   EoRegist,
@@ -203,4 +223,5 @@ export {
   GetEoDatas,
   CustLogin,
   UpdateAvatar,
+  GetAvatar,
 };

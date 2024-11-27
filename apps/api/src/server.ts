@@ -4,6 +4,7 @@ import cors from "cors";
 import ErrorMiddleware from "./middlewares/error.middleware";
 import eventRouter from "./routes/event.routes";
 import userRouter from "./routes/user.routes";
+import path from "path";
 
 const PORT = Number(port) || 8000;
 
@@ -13,6 +14,7 @@ app.use(
   cors({ origin: BASE_WEB_URL || "http://localhost:3000", credentials: true })
 );
 
+app.use(`/public`, express.static(path.join(__dirname, "../public")));
 app.use(express.json());
 
 app.use("/event", eventRouter);
@@ -27,4 +29,7 @@ app.use(ErrorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // DONT FORGET TO DELETE THIS!
+  console.log("Serving files from:", path.join(__dirname, "../public"));
 });

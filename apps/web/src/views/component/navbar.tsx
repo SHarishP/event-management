@@ -17,6 +17,10 @@ export default function Navbar() {
     setBurgerOpen(!burgerOpen);
   };
 
+  const userSlug = (user: string) => {
+    return user.replace(" ", "-").toLowerCase();
+  };
+
   const renderContentBasedRole = () => {
     if (user) {
       if (user.role === "eo") {
@@ -25,6 +29,9 @@ export default function Navbar() {
             <div className="items-center w-3/4 text-center">
               <button className="hover:bg-blue-500 mx-4">All Events</button>
               <button className="hover:bg-blue-500 mx-4">Create Event</button>
+              <button className="hover:bg-blue-500 mx-4">
+                <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
+              </button>
             </div>
             <div className="w-1/4 flex justify-end items-center gap-2">
               <p>Welcome, {user.name}</p>
@@ -48,6 +55,9 @@ export default function Navbar() {
               <button className="hover:bg-blue-500 mx-4">Find Events</button>
               <button className="hover:bg-blue-500 mx-4">
                 Find my Tickets
+              </button>
+              <button className="hover:bg-blue-500 mx-4">
+                <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
               </button>
               <input
                 type="text"

@@ -3,6 +3,7 @@ import {
   CustLogin,
   CustRegist,
   EoRegist,
+  GetAvatar,
   GetCustDatas,
   GetEoDatas,
   UpdateAvatar,
@@ -21,7 +22,8 @@ router.post("/eo-regist", RegisterValidation, EoRegist);
 router.get("/cust-list", GetCustDatas);
 router.get("/eo-list", GetEoDatas);
 router.post("/login", LoginValidation, CustLogin);
-router.post(
+router.get("/avatar", VerifyToken, GetAvatar);
+router.patch(
   "/avatar",
   VerifyToken,
   SingleUploader("AVT", "/avatar"),

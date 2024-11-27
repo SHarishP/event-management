@@ -26,7 +26,6 @@ const HandleLogin = async (onAuthSuccess: (user: IUser | null) => void) => {
     if (access_token) {
       const user: IUser = jwtDecode(access_token);
       onAuthSuccess(user);
-      console.log(user.avatar);
     }
   } catch (err) {
     deleteCookie("access_token");
