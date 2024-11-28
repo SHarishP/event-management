@@ -55,19 +55,17 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
       });
     });
 
+    // payload for verification
     const payload = {
       email,
     };
     const token = sign(payload, SECRET_KEY as string, { expiresIn: "1hr" });
-
     const verificationUrl = BASE_WEB_URL + `/verify/${token}`;
-
     const html = compiledTemplate({
       email: email,
       name: name,
       verificationUrl,
     });
-
     await transporter.sendMail({
       to: email,
       subject: "Welcome to our website",
@@ -75,7 +73,8 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     });
 
     res.status(200).send({
-      message: "Customer registration success",
+      message:
+        "Customer registration success. Please check your email to verify your account!",
     });
   } catch (err) {
     next(err);
@@ -99,11 +98,20 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
     });
     if (!findRoleEo) throw new Error("Role doesn't exist!");
 
+    // Convert plain password to hash
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "register-mail.hbs"
+    );
+    const templateSource = await fs.readFileSync(templatePath, "utf-8");
+    const compiledTemplate = handlebars.compile(templateSource);
+
     await prisma.$transaction(async (prisma) => {
-      const newEo = await prisma.user.create({
+      await prisma.user.create({
         data: {
           name,
           email,
@@ -114,14 +122,26 @@ async function EoRegist(req: Request, res: Response, next: NextFunction) {
       });
     });
 
+    // payload for verification
+    const payload = {
+      email,
+    };
+    const token = sign(payload, SECRET_KEY as string, { expiresIn: "1hr" });
+    const verificationUrl = BASE_WEB_URL + `/verify/${token}`;
+    const html = compiledTemplate({
+      email: email,
+      name: name,
+      verificationUrl,
+    });
     await transporter.sendMail({
       to: email,
       subject: "Welcome to our website",
-      // html,
+      html,
     });
 
     res.status(200).send({
-      message: "EO registration success",
+      message:
+        "EO registration success. Please check your email to verify your account!",
     });
   } catch (err) {
     next(err);
@@ -175,30 +195,33 @@ async function GetEoDatas(req: Request, res: Response, next: NextFunction) {
 }
 
 // Cust Login function
-async function CustLogin(req: Request, res: Response, next: NextFunction) {
+async function UserLogin(req: Request, res: Response, next: NextFunction) {
   try {
     const { email, password } = req.body;
 
     // Check if email exist in database
-    const findCust = await prisma.user.findUnique({
+    const findUser = await prisma.user.findUnique({
       where: { email },
       include: {
         role: true,
       },
     });
     // If email doesn't exist throw new Error
-    if (!findCust) throw new Error("Invalid email!");
+    if (!findUser) throw new Error("Invalid email!");
+
+    if (!findUser.isVerified)
+      throw new Error("Please verify your account first");
 
     // Compare password with salt and check if password is valid
-    const isValid = await compare(password, findCust.password);
+    const isValid = await compare(password, findUser.password);
     if (!isValid) throw new Error("Invalid password!");
 
     // Use JWT
     const payload = {
       email,
-      name: findCust.name,
-      role: findCust.role.name,
-      avatar: findCust.avatar,
+      name: findUser.name,
+      role: findUser.role.name,
+      avatar: findUser.avatar,
     };
     const custToken = sign(payload, SECRET_KEY as string, { expiresIn: "1d" });
 
@@ -245,12 +268,31 @@ async function GetAvatar(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function VerifyUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email } = req.user as User;
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        isVerified: true,
+      },
+    });
+    res.status(200).send({
+      message: "Verify Success",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export {
   CustRegist,
   EoRegist,
   GetCustDatas,
   GetEoDatas,
-  CustLogin,
+  UserLogin,
   UpdateAvatar,
   GetAvatar,
+  VerifyUser,
 };

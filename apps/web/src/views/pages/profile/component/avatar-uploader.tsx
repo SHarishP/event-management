@@ -9,7 +9,11 @@ interface IAvatar {
   avatar: string;
 }
 
-export default function AvatarForm() {
+interface AvatarFormProps {
+  onAvatarUpdated: () => void;
+}
+
+export default function AvatarForm({ onAvatarUpdated }: AvatarFormProps) {
   const updateAvatar = async (values: IAvatar) => {
     try {
       const formData = new FormData();
@@ -22,6 +26,8 @@ export default function AvatarForm() {
         showConfirmButton: false,
         timer: 2000,
       });
+
+      onAvatarUpdated();
     } catch (err) {
       ErrorHandler(err);
     }

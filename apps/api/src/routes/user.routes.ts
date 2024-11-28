@@ -1,12 +1,13 @@
 import { Router } from "express";
 import {
-  CustLogin,
+  UserLogin,
   CustRegist,
   EoRegist,
   GetAvatar,
   GetCustDatas,
   GetEoDatas,
   UpdateAvatar,
+  VerifyUser,
 } from "../controllers/user.controller";
 import {
   RegisterValidation,
@@ -19,9 +20,10 @@ const router = Router();
 
 router.post("/cust-regist", RegisterValidation, CustRegist);
 router.post("/eo-regist", RegisterValidation, EoRegist);
+router.get("/verify", VerifyToken, VerifyUser);
 router.get("/cust-list", GetCustDatas);
 router.get("/eo-list", GetEoDatas);
-router.post("/login", LoginValidation, CustLogin);
+router.post("/login", LoginValidation, UserLogin);
 router.get("/avatar", VerifyToken, GetAvatar);
 router.patch(
   "/avatar",

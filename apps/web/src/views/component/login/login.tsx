@@ -39,7 +39,6 @@ export default function LoginModal({
   Link,
 }: IloginModalProps) {
   const { onAuthSuccess, user } = useAuthStore();
-  const router = useRouter();
   const login = async (params: ILogin) => {
     try {
       const { data } = await axiosInstance.post("/user/login", params);
