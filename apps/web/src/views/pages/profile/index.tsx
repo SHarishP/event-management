@@ -20,11 +20,15 @@ export default function ProfileView() {
       return null;
     }
   };
+
+  const updateAvatarUrl = async () => {
+    const url = await HandleAvatarUrl();
+    setAvatarUrl(url);
+  };
+
   useEffect(() => {
     if (user?.email) {
-      HandleAvatarUrl().then((url) => {
-        setAvatarUrl(url); // Menyimpan URL avatar ke state
-      });
+      updateAvatarUrl();
     }
   }, [user?.email]);
 
@@ -48,7 +52,7 @@ export default function ProfileView() {
             )}
             <p className="ml-4">{user.name}</p>
           </div>
-          <AvatarForm />
+          <AvatarForm onAvatarUpdated={updateAvatarUrl} />
         </div>
       )}
     </div>

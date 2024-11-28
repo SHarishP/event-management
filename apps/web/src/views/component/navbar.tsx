@@ -135,6 +135,9 @@ export default function Navbar() {
             <p>Welcome, {user.name}!</p>
             <button className="hover:bg-blue-500 py-2">Find Events</button>
             <button className="hover:bg-blue-500 py-2">Create Event</button>
+            <button className="hover:bg-blue-500 mx-4">
+              <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
+            </button>
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
               type="submit"
@@ -153,6 +156,9 @@ export default function Navbar() {
             <p>Welcome, {user.name}!</p>
             <button className="hover:bg-blue-500 py-2">Find Events</button>
             <button className="hover:bg-blue-500 py-2">Find my Tickets</button>
+            <button className="hover:bg-blue-500 mx-4">
+              <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
+            </button>
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
               type="submit"
