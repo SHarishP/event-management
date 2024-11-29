@@ -21,11 +21,40 @@ model User{
   avatar String
   isVerified Boolean @default(false)
   roleID Int
+  // column for points
+  totalPoints Int? // Optional for non-cust roles
+  // column for referral
+  referralCode String? @unique  // Nullable because not all users have referal code
+
+  // code for relation
   role Role @relation(fields: [roleID], references: [id])
+  coupons Coupon[]
+  referrals     Referral[] @relation("Referrer")
+  referredBy    Referral?  @relation("ReferredBy") // Nullable because not all users have a referrer
 }
 
 model Role {
   id Int @id @default(autoincrement())
   name String @unique
   user User[]
+}
+
+model Referral {
+  id           Int      @id @default(autoincrement())
+  referrerId   Int
+  referredId   Int      @unique //Menambahkan @unique di sini untuk menunjukkan relasi satu-ke-satu
+  points       Int      @default(10000)
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  referrer     User     @relation("Referrer", fields: [referrerId], references: [id])
+  referred     User     @relation("ReferredBy", fields: [referredId], references: [id])
+}
+
+model Coupon {
+  id Int      @id @default(autoincrement())
+  discount Float @default(0.1) // 0.1 = 10%
+  isUsed Boolean @default(false)
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 }

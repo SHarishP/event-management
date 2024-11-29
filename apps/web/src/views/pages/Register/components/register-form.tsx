@@ -6,6 +6,8 @@ import IRegister from "../types";
 import { RegisterSchema } from "@/lib/schema";
 import ErrorHandler from "@/utils/error-handler";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import debounce from "lodash.debounce";
 
 export function EoRegist() {
   const router = useRouter();
@@ -34,6 +36,7 @@ export function EoRegist() {
           name: "",
           email: "",
           password: "",
+          refCode: "",
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
@@ -119,6 +122,23 @@ export function EoRegist() {
 export function CustRegist() {
   const router = useRouter();
 
+  // To check and send to BE if referral code is valid
+  const [refValid, setRefValid] = useState<string | null>(null);
+  const validateRefCode = debounce(async (refCode: string) => {
+    if (!refCode) {
+      setRefValid(null);
+      return;
+    }
+    try {
+      const { data } = await axiosInstance.post("/user/referral", {
+        refCode,
+      });
+      setRefValid(data.message);
+    } catch {
+      setRefValid("Invalid referral code!");
+    }
+  });
+
   //
   const register = async (params: IRegister) => {
     try {
@@ -143,6 +163,7 @@ export function CustRegist() {
           name: "",
           email: "",
           password: "",
+          refCode: "",
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
@@ -172,6 +193,7 @@ export function CustRegist() {
                   )}
                 </div>
               </div>
+
               <div className="py-2">
                 <label htmlFor="email" className="formik-label">
                   Email :
@@ -206,6 +228,29 @@ export function CustRegist() {
                   />
                   {touched.password && errors.password ? (
                     <div className="text-red-600 h-6">{errors.password}</div>
+                  ) : (
+                    <div className="h-6" />
+                  )}
+                </div>
+              </div>
+
+              <div className="py-2">
+                <label htmlFor="referralCode" className="formik-label">
+                  Referral Code (Optional) :
+                </label>
+                <div>
+                  <Field
+                    className="formik-input"
+                    type="text"
+                    name="refCode"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      handleChange(e);
+                      validateRefCode(e.target.value); // Call backend validation
+                    }}
+                    value={values.refCode}
+                  />
+                  {refValid !== null ? (
+                    <div>{refValid}</div>
                   ) : (
                     <div className="h-6" />
                   )}
