@@ -9,6 +9,8 @@ import { transporter } from "../lib/mail";
 import path from "path";
 import handlebars from "handlebars";
 import fs from "fs";
+import { nanoid } from "nanoid";
+import { disconnect } from "process";
 
 const PORT = Number(port) || 8000;
 const prisma = new PrismaClient();
@@ -16,7 +18,7 @@ const prisma = new PrismaClient();
 // Register customer to database
 async function CustRegist(req: Request, res: Response, next: NextFunction) {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, referralCode } = req.body;
 
     // Check if email already exist
     const findCust = await prisma.user.findUnique({
@@ -34,6 +36,7 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     const salt = await genSalt(10);
     const hashPassword = await hash(password, salt);
 
+    // Code for to send validation email to new user
     const templatePath = path.join(
       __dirname,
       "../templates",
@@ -42,17 +45,71 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     const templateSource = await fs.readFileSync(templatePath, "utf-8");
     const compiledTemplate = handlebars.compile(templateSource);
 
+    // If new user insert Referral code, find the referral owner
+    let refOwner = null;
+    if (referralCode) {
+      refOwner = await prisma.user.findUnique({
+        where: { referralCode },
+      });
+      if (!refOwner) throw new Error("Invalid referral code");
+
+      // Check referral code user
+      const refCount = await prisma.referral.count({
+        where: { referrerId: refOwner.id },
+      });
+      if (refCount >= 3) {
+        throw new Error("This referral code has expired!");
+      }
+    }
+
+    // Generate unique referralCode for the new user
+    const newReferralCode = nanoid(8);
+
     // Input cust data to database
     await prisma.$transaction(async (prisma) => {
-      await prisma.user.create({
+      const newUser = await prisma.user.create({
         data: {
           name,
           email,
           password: hashPassword,
           roleID: findRoleCust.id,
           avatar: "AVT_default.jpg",
+          referralCode: newReferralCode,
+          totalPoints: 0,
         },
       });
+
+      // If new user insert Referral code, update referral owner's referral count
+      if (refOwner) {
+        const now = new Date();
+        const expiresIn = new Date(now);
+        expiresIn.setMonth(now.getMonth() + 3);
+
+        await prisma.referral.create({
+          data: {
+            referrerId: refOwner.id,
+            referredId: newUser.id,
+            expiresAt: expiresIn,
+          },
+        });
+
+        // Generate coupon for the new user
+        await prisma.coupon.create({
+          data: {
+            userId: newUser.id,
+          },
+        });
+
+        // Add poin to Referral Owner by 10000
+        await prisma.user.update({
+          where: { id: refOwner.id },
+          data: {
+            totalPoints: {
+              increment: 10000,
+            },
+          },
+        });
+      }
     });
 
     // payload for verification
@@ -64,6 +121,7 @@ async function CustRegist(req: Request, res: Response, next: NextFunction) {
     const html = compiledTemplate({
       email: email,
       name: name,
+      newReferralCode,
       verificationUrl,
     });
     await transporter.sendMail({
@@ -286,6 +344,27 @@ async function VerifyUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// Function to find referralCode
+async function FindRefCode(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { refCode } = req.body;
+    const refIsValid = await prisma.user.findUnique({
+      where: { referralCode: refCode },
+    });
+    if (!refIsValid) {
+      res.status(404).send({ message: "Invalid Referral Code" });
+    }
+
+    if (refIsValid) {
+      res.status(200).send({
+        message: "You get 10% discount!",
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
 export {
   CustRegist,
   EoRegist,
@@ -295,4 +374,5 @@ export {
   UpdateAvatar,
   GetAvatar,
   VerifyUser,
+  FindRefCode,
 };
