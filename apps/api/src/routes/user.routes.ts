@@ -8,6 +8,7 @@ import {
   GetEoDatas,
   UpdateAvatar,
   VerifyUser,
+  FindRefCode,
 } from "../controllers/user.controller";
 import {
   RegisterValidation,
@@ -31,5 +32,6 @@ router.patch(
   SingleUploader("AVT", "/avatar"),
   UpdateAvatar
 );
+router.post("/referral", FindRefCode);
 
 export default router;

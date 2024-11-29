@@ -344,6 +344,27 @@ async function VerifyUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// Function to find referralCode
+async function FindRefCode(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { refCode } = req.body;
+    const refIsValid = await prisma.user.findUnique({
+      where: { referralCode: refCode },
+    });
+    if (!refIsValid) {
+      res.status(404).send({ message: "Invalid Referral Code" });
+    }
+
+    if (refIsValid) {
+      res.status(200).send({
+        message: "You get 10% discount!",
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
 export {
   CustRegist,
   EoRegist,
@@ -353,4 +374,5 @@ export {
   UpdateAvatar,
   GetAvatar,
   VerifyUser,
+  FindRefCode,
 };
