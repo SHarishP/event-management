@@ -1,4 +1,4 @@
-import express, { Request, Response, Application } from "express";
+import express, { Request, Response, Application, NextFunction } from "express";
 import { BASE_WEB_URL, PORT as port } from "./config/envConfig";
 import cors from "cors";
 import ErrorMiddleware from "./middlewares/error.middleware";
@@ -26,6 +26,11 @@ app.use("/user", userRouter);
 // });
 
 app.use(ErrorMiddleware);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
+  res.status(500).send({ message: err.message || "Something went wrong" });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
