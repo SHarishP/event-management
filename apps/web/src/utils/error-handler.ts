@@ -10,6 +10,6 @@ export default function ErrorHandler(err: any) {
     icon: "error",
     title: message,
     showConfirmButton: false,
-    timer: 2000,
+    timer: 10000,
   });
 }

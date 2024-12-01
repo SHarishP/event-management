@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { number, object, string } from "yup";
 interface IValidationMessage {
   name: {
     notEmpty: string;
@@ -52,4 +52,14 @@ const LoginSchema = object({
   password: string().required(validationMessage.password.notEmpty),
 });
 
-export { RegisterSchema, LoginSchema };
+const EventSchema = object({
+  name: string().required(validationMessage.name.notEmpty),
+  price: number().required("Price required!"),
+  startDate: string().required("Date of event required!"),
+  startTime: string().required("Time of event required!"),
+  location: string().required("Location required!"),
+  category: string().required("Category required!"),
+  description: string(),
+});
+
+export { RegisterSchema, LoginSchema, EventSchema };

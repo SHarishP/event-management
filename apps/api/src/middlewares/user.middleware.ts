@@ -21,6 +21,7 @@ async function VerifyToken(req: Request, res: Response, next: NextFunction) {
 async function EoGuard(req: Request, res: Response, next: NextFunction) {
   try {
     if (req.user?.role !== "eo") throw new Error("Not an EO!");
+    console.log("Request User :", req.user);
     next();
   } catch (err) {
     next(err);

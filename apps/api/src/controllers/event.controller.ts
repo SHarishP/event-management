@@ -13,7 +13,6 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
       startTime,
       location,
       category,
-      availableSeat,
       description,
     } = req.body;
     const { id: eoId } = req.user as User;
@@ -24,7 +23,6 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
     if (!price) throw new Error("Price required!");
     if (!startDate || !startTime)
       throw new Error("Start Date and Time required!");
-    if (!availableSeat) throw new Error("Available Seat required!");
 
     // Periksa apakah lokasi ada
     const findLocation = await prisma.location.findFirst({
