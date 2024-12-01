@@ -69,7 +69,8 @@ model Event {
   startTime     String 
   locationId    Int
   categoryId    Int
-  description    String? @db.Text
+  description   String? @db.Text
+  banner        String
   // Relation
   createdBy User @relation(fields: [createdById], references: [id])
   location      Location? @relation(fields: [locationId], references: [id])

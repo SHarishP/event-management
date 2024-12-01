@@ -1,4 +1,4 @@
-import { number, object, string } from "yup";
+import { number, object, string, mixed } from "yup";
 interface IValidationMessage {
   name: {
     notEmpty: string;
@@ -52,6 +52,7 @@ const LoginSchema = object({
   password: string().required(validationMessage.password.notEmpty),
 });
 
+const maxSize = 2 * 1024 * 1024;
 const EventSchema = object({
   name: string().required(validationMessage.name.notEmpty),
   price: number().required("Price required!"),
@@ -60,6 +61,9 @@ const EventSchema = object({
   location: string().required("Location required!"),
   category: string().required("Category required!"),
   description: string(),
+  file: mixed().test("fileSize", "file exceed maxsize", (value: any) => {
+    return value ? value.size <= maxSize : true;
+  }),
 });
 
 export { RegisterSchema, LoginSchema, EventSchema };

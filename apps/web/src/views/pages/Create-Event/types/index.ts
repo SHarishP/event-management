@@ -6,4 +6,5 @@ export default interface IEvent {
   location: string;
   category: string;
   description: string;
+  file: string;
 }

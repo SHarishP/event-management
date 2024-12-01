@@ -31,10 +31,12 @@ export const SingleUploader = (filePrefix: string, folderName?: string) => {
 
         // Membaca jumlah file di folder tujuan
         const files = readdirSync(destination);
-        const avatarFiles = files.filter((file) => file.startsWith(filePrefix));
+        const numberedFiles = files.filter((file) =>
+          file.startsWith(filePrefix)
+        );
 
         // Menentukan nomor urut berikutnya
-        const nextIndex = avatarFiles.length + 1;
+        const nextIndex = numberedFiles.length + 1;
         const paddedIndex = String(nextIndex).padStart(4, "0");
 
         const originalNameParts = file.originalname.split(".");

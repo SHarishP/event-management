@@ -17,10 +17,17 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
     } = req.body;
     const { id: eoId } = req.user as User;
     const { name: eoName } = req.user as User;
+    const { file } = req;
+
+    // Konversi price ke integer
+    const priceInt = parseInt(price, 10);
+    if (isNaN(priceInt)) {
+      throw new Error("Price must be a valid number!");
+    }
 
     // Validasi input
     if (!name) throw new Error("Name required!");
-    if (!price) throw new Error("Price required!");
+    if (!priceInt) throw new Error("Price required!");
     if (!startDate || !startTime)
       throw new Error("Start Date and Time required!");
 
@@ -38,6 +45,9 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
     if (!findCategory) throw new Error("Category not found!");
     let categoryId: number = findCategory.id;
 
+    // If banner doesn't exist, use default banner
+    const eventBanner = file?.filename ?? "EVT_default.jpg";
+
     // Test YOU NEED TO DELETE IT LATER
     console.log(eoName);
     console.log(`id: ${eoId}`);
@@ -47,12 +57,13 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
       data: {
         name,
         createdById: eoId,
-        price,
+        price: priceInt,
         startDate,
         startTime,
         locationId: findLocation.id,
         categoryId: findCategory.id,
         description,
+        banner: eventBanner,
       },
     });
 
@@ -81,4 +92,36 @@ async function GetMyEvents(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { CreateEvent, GetMyEvents };
+async function GetCategories(req: Request, res: Response, next: NextFunction) {
+  try {
+    const categories = await prisma.category.findMany({
+      select: {
+        name: true,
+      },
+    });
+    res.status(200).send({
+      message: "Success",
+      categories,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function GetLocations(req: Request, res: Response, next: NextFunction) {
+  try {
+    const locations = await prisma.location.findMany({
+      select: {
+        name: true,
+      },
+    });
+    res.status(200).send({
+      message: "Success",
+      locations,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export { CreateEvent, GetMyEvents, GetCategories, GetLocations };
