@@ -10,7 +10,6 @@ import path from "path";
 import handlebars from "handlebars";
 import fs from "fs";
 import { nanoid } from "nanoid";
-import { disconnect } from "process";
 
 const PORT = Number(port) || 8000;
 const prisma = new PrismaClient();
@@ -277,6 +276,7 @@ async function UserLogin(req: Request, res: Response, next: NextFunction) {
     // Use JWT
     const payload = {
       email,
+      id: findUser.id,
       name: findUser.name,
       role: findUser.role.name,
       avatar: findUser.avatar,
