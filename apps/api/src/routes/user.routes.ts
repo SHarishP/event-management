@@ -21,7 +21,7 @@ const router = Router();
 
 router.post("/cust-regist", RegisterValidation, CustRegist);
 router.post("/eo-regist", RegisterValidation, EoRegist);
-router.get("/verify", VerifyUser);
+router.get("/verify", VerifyToken, VerifyUser);
 router.get("/cust-list", GetCustDatas);
 router.get("/eo-list", GetEoDatas);
 router.post("/login", LoginValidation, UserLogin);

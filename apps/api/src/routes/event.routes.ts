@@ -5,6 +5,10 @@ import {
   GetMyEvents,
   GetCategories,
   GetLocations,
+  GetAllEvents,
+  GetEventsByCategory,
+  GetEventsByLoc,
+  GetEventsByFilter,
 } from "../controllers/event.controller";
 import { SingleUploader } from "../config/uploader";
 
@@ -21,8 +25,12 @@ router.post(
 // Second Function to test if Verify Token is Working
 router.get("/my-events", VerifyToken, EoGuard, GetMyEvents);
 
-router.get("/categories", VerifyToken, EoGuard, GetCategories);
+router.get("/categories", GetCategories);
 
-router.get("/locations", VerifyToken, EoGuard, GetLocations);
+router.get("/locations", GetLocations);
+
+router.get("/all-events", GetAllEvents);
+
+router.get("", GetEventsByFilter);
 
 export default router;
