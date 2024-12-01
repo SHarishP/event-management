@@ -14,23 +14,24 @@ datasource db {
 }
 
 model User{
-  id  Int @id @default(autoincrement())
-  name String @db.VarChar(30)
-  email String @unique
-  password String
-  avatar String
-  isVerified Boolean @default(false)
-  roleID Int
+  id            Int @id @default(autoincrement())
+  name          String @db.VarChar(30)
+  email         String @unique
+  password      String
+  avatar        String
+  isVerified    Boolean @default(false)
+  roleID        Int
   // column for points
-  totalPoints Int? // Optional for non-cust roles
+  totalPoints   Int? // Optional for non-cust roles
   // column for referral
-  referralCode String? @unique  // Nullable because not all users have referal code
+  referralCode  String? @unique  // Nullable because not all users have referal code
 
   // code for relation
-  role Role @relation(fields: [roleID], references: [id])
-  coupons Coupon[]
+  role          Role @relation(fields: [roleID], references: [id])
+  coupons       Coupon[]
   referrals     Referral[] @relation("Referrer")
   referredBy    Referral?  @relation("ReferredBy") // Nullable because not all users have a referrer
+  events        Event[]
 }
 
 model Role {
@@ -52,9 +53,38 @@ model Referral {
 }
 
 model Coupon {
-  id Int      @id @default(autoincrement())
-  discount Float @default(0.1) // 0.1 = 10%
-  isUsed Boolean @default(false)
-  userId Int
-  user User @relation(fields: [userId], references: [id])
+  id            Int      @id @default(autoincrement())
+  discount      Float @default(0.1) // 0.1 = 10%
+  isUsed        Boolean @default(false)
+  userId        Int
+  user          User @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id            Int @id @default(autoincrement())
+  name          String
+  createdById   Int
+  price         Int
+  startDate     String
+  startTime     String 
+  locationId    Int
+  categoryId    Int
+  description   String? @db.Text
+  banner        String
+  // Relation
+  createdBy User @relation(fields: [createdById], references: [id])
+  location      Location? @relation(fields: [locationId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Location {
+  id Int @id @default(autoincrement())
+  name String 
+  events Event[]
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String @unique
+  events Event[]
 }

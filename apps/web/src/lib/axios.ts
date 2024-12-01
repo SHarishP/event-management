@@ -2,7 +2,7 @@ import axios from "axios";
 import { getCookie } from "cookies-next";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_API_URL || "http://lcoalhost:8000",
+  baseURL: process.env.NEXT_PUBLIC_BASE_API_URL || "http://localhost:8000",
   withCredentials: true,
 });
 
