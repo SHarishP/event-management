@@ -64,6 +64,7 @@ const EventSchema = object({
   file: mixed().test("fileSize", "file exceed maxsize", (value: any) => {
     return value ? value.size <= maxSize : true;
   }),
+  totalSeats: number().required("Seat required!"),
 });
 
 export { RegisterSchema, LoginSchema, EventSchema };

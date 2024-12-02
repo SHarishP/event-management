@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { User } from "../custom";
-import { error } from "console";
 
 const prisma = new PrismaClient();
 
@@ -15,6 +14,7 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
       location,
       category,
       description,
+      totalSeats,
     } = req.body;
     const { id: eoId } = req.user as User;
     const { name: eoName } = req.user as User;
@@ -26,9 +26,16 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
       throw new Error("Price must be a valid number!");
     }
 
+    // Conversion totalSeats to Int
+    const seatInt = parseInt(totalSeats, 10);
+    if (isNaN(seatInt)) {
+      throw new Error("Total Seats must be a valid number!");
+    }
+
     // Validasi input
     if (!name) throw new Error("Name required!");
     if (!priceInt) throw new Error("Price required!");
+    if (!seatInt) throw new Error("Seat is required");
     if (!startDate || !startTime)
       throw new Error("Start Date and Time required!");
 
@@ -65,6 +72,8 @@ async function CreateEvent(req: Request, res: Response, next: NextFunction) {
         categoryId: findCategory.id,
         description,
         banner: eventBanner,
+        totalSeats: seatInt,
+        remainSeats: seatInt,
       },
     });
 
@@ -145,6 +154,8 @@ async function GetAllEvents(req: Request, res: Response, next: NextFunction) {
         },
         description: true,
         banner: true,
+        totalSeats: true,
+        remainSeats: true,
       },
     });
     res.status(200).send({

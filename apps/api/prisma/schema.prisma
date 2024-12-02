@@ -32,6 +32,7 @@ model User{
   referrals     Referral[] @relation("Referrer")
   referredBy    Referral?  @relation("ReferredBy") // Nullable because not all users have a referrer
   events        Event[]
+  transaction Transaction[]
 }
 
 model Role {
@@ -71,10 +72,13 @@ model Event {
   categoryId    Int
   description   String? @db.Text
   banner        String
+  totalSeats    Int
+  remainSeats   Int
   // Relation
   createdBy User @relation(fields: [createdById], references: [id])
   location      Location? @relation(fields: [locationId], references: [id])
   category Category? @relation(fields: [categoryId], references: [id])
+  transaction Transaction[]
 }
 
 model Location {
@@ -87,4 +91,31 @@ model Category {
   id Int @id @default(autoincrement())
   name String @unique
   events Event[]
+}
+
+model Transaction {
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  userId        Int
+  seats         Int
+  usePoints     Int?
+  totalPrice    Int
+  isPaid        Boolean @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  paymentId        Int?
+
+  // relation
+  event Event @relation(fields: [eventId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  payment Payment? @relation("TransactionPayment", fields: [paymentId], references: [id]) 
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  amountPaid    Int
+  paymentProof  String?
+  isPaid        Boolean @default(false)
+
+  transactions   Transaction[] @relation("TransactionPayment")
 }
