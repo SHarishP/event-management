@@ -37,7 +37,6 @@ export default function HomePageView() {
     const getAllEvents = async () => {
       try {
         const response = await axiosInstance.get("/event/all-events");
-        console.log(response.data.events);
         setEvents(response.data.events);
       } catch (err) {
         ErrorHandler(err);

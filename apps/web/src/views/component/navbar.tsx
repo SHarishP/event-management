@@ -31,6 +31,9 @@ export default function Navbar() {
                 <a href="/create-event">Create Event</a>
               </button>
               <button className="hover:bg-blue-500 mx-4">
+                <a href="/my-events">My Events</a>
+              </button>
+              <button className="hover:bg-blue-500 mx-4">
                 <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
               </button>
             </div>
@@ -134,8 +137,10 @@ export default function Navbar() {
           <div className="flex flex-col p-4 text-center gap-4">
             <p>Welcome, {user.name}!</p>
             <button className="hover:bg-blue-500 py-2">
-              {" "}
               <a href="/create-event">Create Event</a>
+            </button>
+            <button className="hover:bg-blue-500 mx-4">
+              <a href="/my-events">My Events</a>
             </button>
             <button className="hover:bg-blue-500 mx-4">
               <a href={`/profile/${userSlug(user.name)}`}>Profile</a>

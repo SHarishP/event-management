@@ -94,10 +94,33 @@ async function GetMyEvents(req: Request, res: Response, next: NextFunction) {
 
     const myEvents = await prisma.event.findMany({
       where: { createdById: eoId },
+      select: {
+        name: true,
+        location: {
+          select: {
+            name: true,
+          },
+        },
+        totalSeats: true,
+        remainSeats: true,
+        transaction: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+            seats: true,
+            isPaid: true,
+          },
+        },
+      },
     });
+
     res.status(200).send({
       message: "This is your event(s)!",
-      data: myEvents,
+      myEvents,
     });
   } catch (err) {
     next(err);
