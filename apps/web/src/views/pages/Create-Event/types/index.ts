@@ -7,4 +7,5 @@ export default interface IEvent {
   category: string;
   description: string;
   file: string;
+  totalSeats: number;
 }

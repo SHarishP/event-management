@@ -63,6 +63,7 @@ export function EventForm() {
       formData.append("location", values.location);
       formData.append("category", values.category);
       formData.append("description", values.description);
+      formData.append("totalSeats", values.totalSeats.toString());
       // Add the banner file if it exists
       if (values.file) {
         formData.append("file", values.file);
@@ -104,6 +105,7 @@ export function EventForm() {
           category: "",
           description: "",
           file: "",
+          totalSeats: 0,
         }}
         validationSchema={EventSchema}
         onSubmit={(values, { setSubmitting }) => {
@@ -134,6 +136,7 @@ export function EventForm() {
                   )}
                 </div>
               </div>
+
               <div className="py-2">
                 <label htmlFor="price" className="formik-label">
                   Event Price :
@@ -148,6 +151,26 @@ export function EventForm() {
                   />
                   {touched.price && errors.price ? (
                     <div className="text-red-600 h-6">{errors.price}</div>
+                  ) : (
+                    <div className="h-6" />
+                  )}
+                </div>
+              </div>
+
+              <div className="py-2">
+                <label htmlFor="totalSeats" className="formik-label">
+                  Seat Available :
+                </label>
+                <div>
+                  <Field
+                    className="formik-input"
+                    type="number"
+                    name="totalSeats"
+                    onChange={handleChange}
+                    value={values.totalSeats}
+                  />
+                  {touched.totalSeats && errors.totalSeats ? (
+                    <div className="text-red-600 h-6">{errors.totalSeats}</div>
                   ) : (
                     <div className="h-6" />
                   )}

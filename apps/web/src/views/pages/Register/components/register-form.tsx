@@ -36,7 +36,7 @@ export function EoRegist() {
           name: "",
           email: "",
           password: "",
-          refCode: "",
+          referralCode: "",
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
@@ -163,7 +163,7 @@ export function CustRegist() {
           name: "",
           email: "",
           password: "",
-          refCode: "",
+          referralCode: "",
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
@@ -242,12 +242,12 @@ export function CustRegist() {
                   <Field
                     className="formik-input"
                     type="text"
-                    name="refCode"
+                    name="referralCode"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       handleChange(e);
                       validateRefCode(e.target.value); // Call backend validation
                     }}
-                    value={values.refCode}
+                    value={values.referralCode}
                   />
                   {refValid !== null ? (
                     <div>{refValid}</div>

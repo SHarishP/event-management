@@ -4,6 +4,7 @@ import cors from "cors";
 import ErrorMiddleware from "./middlewares/error.middleware";
 import eventRouter from "./routes/event.routes";
 import userRouter from "./routes/user.routes";
+import transactionRouter from "./routes/transaction.routes";
 import path from "path";
 
 const PORT = Number(port) || 8000;
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use("/event", eventRouter);
 app.use("/user", userRouter);
+app.use("/transaction", transactionRouter);
 
 // Testing API
 // app.get("/api", (req: Request, res: Response) => {
