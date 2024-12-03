@@ -13,7 +13,6 @@ export default function ProfileView() {
       const response = await axiosInstance.get(
         `/user/avatar?email=${user?.email}`
       );
-      console.log(response.data);
       return response.data;
     } catch (err) {
       console.log(err);

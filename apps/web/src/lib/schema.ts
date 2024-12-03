@@ -1,4 +1,4 @@
-import { number, object, string, mixed } from "yup";
+import { number, object, string, mixed, array } from "yup";
 interface IValidationMessage {
   name: {
     notEmpty: string;
@@ -64,6 +64,33 @@ const EventSchema = object({
   file: mixed().test("fileSize", "file exceed maxsize", (value: any) => {
     return value ? value.size <= maxSize : true;
   }),
+  totalSeats: number().required("Seat required!"),
 });
 
-export { RegisterSchema, LoginSchema, EventSchema };
+const BookSchema = object({
+  seats: number().required("Seat required!"),
+  usePoints: number().min(0, "Points cannot be negative"),
+});
+
+const Transaction = object({
+  transactionIds: array()
+    .of(number()) // Pastikan array berisi number
+    .min(1, "At least one transaction must be selected") // Pastikan setidaknya ada satu transaksi yang dipilih
+    .required("Transaction selection is required!"),
+  useCoupon: mixed()
+    .oneOf([true, false], "UseCoupon must be either true or false")
+    .required("Coupon selection is required"),
+});
+
+const Payment = object({
+  paymentId: number().required("Payment Id Required!"),
+  paymentProof: string().required("Payment Proof Required"),
+});
+export {
+  RegisterSchema,
+  LoginSchema,
+  EventSchema,
+  BookSchema,
+  Transaction,
+  Payment,
+};

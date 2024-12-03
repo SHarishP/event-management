@@ -9,6 +9,7 @@ import {
   GetEventsByCategory,
   GetEventsByLoc,
   GetEventsByFilter,
+  GetEvent,
 } from "../controllers/event.controller";
 import { SingleUploader } from "../config/uploader";
 
@@ -32,5 +33,7 @@ router.get("/locations", GetLocations);
 router.get("/all-events", GetAllEvents);
 
 router.get("", GetEventsByFilter);
+
+router.get("/book", GetEvent);
 
 export default router;
