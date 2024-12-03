@@ -7,6 +7,7 @@ import IFilter from "./types";
 
 // Define the structure of an event
 interface IEvent {
+  id: string;
   name: string;
   createdBy: {
     name: string;
@@ -19,6 +20,9 @@ interface IEvent {
   };
   description: string;
   banner: string;
+  totalSeats: number;
+  remainSeats: number;
+  bannerUrl: string;
 }
 
 export default function HomePageView() {
@@ -33,6 +37,7 @@ export default function HomePageView() {
     const getAllEvents = async () => {
       try {
         const response = await axiosInstance.get("/event/all-events");
+        console.log(response.data.events);
         setEvents(response.data.events);
       } catch (err) {
         ErrorHandler(err);
@@ -92,6 +97,7 @@ export default function HomePageView() {
     };
     getFilteredEvents();
   }, [category, location]);
+
   return (
     <div className="mt-16">
       {/* Banner Container */}
@@ -104,7 +110,7 @@ export default function HomePageView() {
       </div>
 
       {/* Filter Panel */}
-      <div>
+      <div className="bg-gray-800 p-4 rounded-lg shadow-lg mx-4 mt-2">
         <Formik
           initialValues={{
             category: "",
@@ -119,52 +125,64 @@ export default function HomePageView() {
             const { values, handleChange } = props;
             return (
               <Form>
-                <div className="py-2">
-                  <label htmlFor="category" className="block text-base">
-                    Event Category :
-                  </label>
-                  <Field
-                    as="select"
-                    name="category"
-                    className="formik-input"
-                    onChange={handleChange}
-                    value={values.category}
-                  >
-                    <option value="">Select a Category</option>
-                    {categories.map((category, idx) => (
-                      <option key={idx} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Category Dropdown */}
+                  <div className="py-2">
+                    <label
+                      htmlFor="category"
+                      className="block text-white text-base"
+                    >
+                      Event Category :
+                    </label>
+                    <Field
+                      as="select"
+                      name="category"
+                      className="formik-input w-full bg-gray-700 text-white border-gray-600 rounded p-2 mt-1"
+                      onChange={handleChange}
+                      value={values.category}
+                    >
+                      <option value="">Select a Category</option>
+                      {categories.map((category, idx) => (
+                        <option key={idx} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </Field>
+                  </div>
+
+                  {/* Location Dropdown */}
+                  <div className="py-2">
+                    <label
+                      htmlFor="location"
+                      className="block text-white text-base"
+                    >
+                      Event Location :
+                    </label>
+                    <Field
+                      as="select"
+                      name="location"
+                      className="formik-input w-full bg-gray-700 text-white border-gray-600 rounded p-2 mt-1"
+                      onChange={handleChange}
+                      value={values.location}
+                    >
+                      <option value="">Select a Location</option>
+                      {locations.map((location, idx) => (
+                        <option key={idx} value={location}>
+                          {location}
+                        </option>
+                      ))}
+                    </Field>
+                  </div>
                 </div>
 
-                <div className="py-2">
-                  <label htmlFor="location" className="block text-base">
-                    Event Location :
-                  </label>
-                  <Field
-                    as="select"
-                    name="location"
-                    className="formik-input"
-                    onChange={handleChange}
-                    value={values.location}
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
                   >
-                    <option value="">Select a Location</option>
-                    {locations.map((location, idx) => (
-                      <option key={idx} value={location}>
-                        {location}
-                      </option>
-                    ))}
-                  </Field>
+                    Filter Events
+                  </button>
                 </div>
-
-                <button
-                  type="submit"
-                  className="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Filter Events
-                </button>
               </Form>
             );
           }}
@@ -173,45 +191,51 @@ export default function HomePageView() {
 
       {/* Events Panel */}
       <div className="mx-auto p-4">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {events.map((event, index) => (
             <div
               key={index}
-              className="bg-[#000000] py-[1em] px-[1em] rounded-[10%] md:mt-[5em] md:mb-[5em]"
+              className="relative group overflow-hidden rounded-lg shadow-lg bg-gray-800 h-72 transition-all duration-300"
             >
-              <div className="py-4 px-8 bg-[#04020a] rounded-[10%] mt-4">
-                <img
-                  src={`/images/${event.banner}`} // Dynamically set the banner image
-                  width={90}
-                  height={"100%"}
-                  className="w-[80px] md:w-[150px]"
-                  alt={event.name}
-                />
-              </div>
-              <h3 className="text-white text-center mt-4 px-2 text-2xl font-bold">
-                {event.name} {/* Display the event name */}
+              {/* Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110 group-hover:brightness-75"
+                style={{ backgroundImage: `url(${event.bannerUrl})` }}
+              ></div>
+
+              {/* Event Details */}
+              {/* Event Name */}
+              <h3 className="absolute top-4 left-4 text-slate-700 text-lg md:text-xl font-bold transition-transform duration-300 group-hover:opacity-0">
+                {event.name}
               </h3>
-              <p className="text-white text-center mt-2">{event.description}</p>{" "}
-              {/* Display event description */}
-              <p className="text-white text-center mt-2">
-                Location: {event.location.name}
-              </p>{" "}
-              {/* Display location */}
-              <p className="text-white text-center mt-2">
-                Price: Rp {event.price}
-              </p>{" "}
-              {/* Display event price */}
-              <p className="text-white text-center mt-2">
-                Start Date: {new Date(event.startDate).toLocaleDateString()}
-              </p>{" "}
-              {/* Format and display start date */}
-              <p className="text-white text-center mt-2">
-                Start Time: {event.startTime}
-              </p>{" "}
-              {/* Display start time */}
-              <button className="border-1 bg-[#28218b] font-bold text-white py-2 px-5 rounded-3xl mb-[4em] md:mb-[1em]">
-                Pilih Event
-              </button>
+              {/* Start Date */}
+              <p className="absolute top-4 right-4 text-slate-700 text-sm md:text-base transition-transform duration-300 group-hover:opacity-0">
+                {new Date(event.startDate).toLocaleDateString()}
+              </p>
+              {/* Location */}
+              <p className="absolute bottom-24 left-4 text-slate-700 text-sm md:text-base transition-transform duration-300 group-hover:opacity-0">
+                {event.location.name}
+              </p>
+              {/* Price */}
+              <p className="absolute bottom-20 left-4 text-slate-700 text-sm md:text-base font-bold transition-transform duration-300 group-hover:opacity-0">
+                Rp {event.price}
+              </p>
+              {/* Start Time */}
+              <p className="absolute bottom-16 left-4 text-slate-700 text-sm md:text-base transition-transform duration-300 group-hover:opacity-0">
+                {event.startTime}
+              </p>
+
+              {/* Description (Replaces Other Text on Hover) */}
+              <p className="absolute inset-0 flex items-center justify-center text-white text-sm md:text-base font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-4">
+                {event.description}
+              </p>
+
+              {/* Button (Unaffected by Hover) */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
+                  <a href={`/book?eventId=${event.id}`}>Book Ticket(s)</a>
+                </button>
+              </div>
             </div>
           ))}
         </div>

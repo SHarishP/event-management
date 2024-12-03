@@ -6,6 +6,8 @@ import {
   GetTransactionsByUser,
   MakePayment,
   UploadPaymentProof,
+  GetPaymentsByUser,
+  GetPaidTransactionsByUser,
 } from "../controllers/transaction.controller";
 
 const router = Router();
@@ -13,11 +15,15 @@ const router = Router();
 router.post("/checkout", VerifyToken, Checkout);
 // Delete Booked Ticket
 router.delete("/:transactionId", VerifyToken, DeleteTransaction);
-// Getting transaction by userId
+// Getting unpaid transaction by userId
 router.get("/cart", VerifyToken, GetTransactionsByUser);
+// Get transaction done by user
+router.get("/done", VerifyToken, GetPaidTransactionsByUser);
 // Process Transaction(s)
 router.post("/payment", VerifyToken, MakePayment);
+// Get Payment
+router.get("/payment", VerifyToken, GetPaymentsByUser);
 // Upload payment proof
-router.post("/uptade", VerifyToken, UploadPaymentProof);
+router.post("/update", VerifyToken, UploadPaymentProof);
 
 export default router;

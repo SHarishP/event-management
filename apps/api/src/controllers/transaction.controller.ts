@@ -157,7 +157,7 @@ async function GetTransactionsByUser(
 
     // Fetch transactions for the user
     const transactions = await prisma.transaction.findMany({
-      where: { userId, isPaid: false },
+      where: { userId, isPaid: false, paymentId: null },
       select: {
         id: true,
         seats: true,
@@ -166,6 +166,9 @@ async function GetTransactionsByUser(
         event: {
           select: {
             name: true,
+            startDate: true,
+            startTime: true,
+            description: true,
             location: {
               select: { name: true },
             },
@@ -180,7 +183,7 @@ async function GetTransactionsByUser(
     // Check if user has no transaction
     if (transactions.length === 0) {
       res.status(404).send({
-        message: "No transactions found for this user",
+        message: "No unpaid transactions found for this user",
       });
     }
     res.status(200).send({
@@ -324,10 +327,123 @@ async function UploadPaymentProof(
   }
 }
 
+// Function to get Payment by Users
+async function GetPaymentsByUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { id: userId } = req.user as User;
+    // Fetch payments for the user, including transactions that are associated with this payment
+    const payments = await prisma.payment.findMany({
+      where: {
+        isPaid: false,
+        transactions: {
+          some: {
+            userId: userId, // Filter transactions by userId
+          },
+        },
+      },
+      include: {
+        transactions: {
+          where: {
+            userId: userId, // Ensure transactions belong to the user
+          },
+          select: {
+            id: true,
+            totalPrice: true,
+            seats: true,
+            event: {
+              select: {
+                name: true,
+                startDate: true,
+                startTime: true,
+                location: {
+                  select: { name: true },
+                },
+                category: {
+                  select: { name: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // If no payments found, return a message
+    if (payments.length === 0) {
+      res.status(404).send({
+        message: "No unpaid payments found for this user",
+      });
+      return;
+    }
+    const Rekening: string = "086745321"; // You need to update it
+    res.status(200).send({
+      message: "Success",
+      payments,
+      Rekening,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Function to get all transactions by user Id
+async function GetPaidTransactionsByUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { id: userId } = req.user as User;
+
+    // Fetch transactions for the user
+    const transactions = await prisma.transaction.findMany({
+      where: { userId, isPaid: true },
+      select: {
+        id: true,
+        seats: true,
+        totalPrice: true,
+        isPaid: true,
+        event: {
+          select: {
+            name: true,
+            startDate: true,
+            startTime: true,
+            description: true,
+            location: {
+              select: { name: true },
+            },
+            category: {
+              select: { name: true },
+            },
+          },
+        },
+      },
+    });
+
+    // Check if user has no transaction
+    if (transactions.length === 0) {
+      res.status(404).send({
+        message: "No transactions found for this user",
+      });
+    }
+    res.status(200).send({
+      message: "Success",
+      transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 export {
   Checkout,
   DeleteTransaction,
   GetTransactionsByUser,
   MakePayment,
   UploadPaymentProof,
+  GetPaymentsByUser,
+  GetPaidTransactionsByUser,
 };

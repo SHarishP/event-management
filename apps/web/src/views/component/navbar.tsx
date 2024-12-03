@@ -27,8 +27,9 @@ export default function Navbar() {
         return (
           <div className="hidden md:flex gap-4 items-center basis-4/5">
             <div className="items-center w-3/4 text-center">
-              <button className="hover:bg-blue-500 mx-4">All Events</button>
-              <button className="hover:bg-blue-500 mx-4">Create Event</button>
+              <button className="hover:bg-blue-500 mx-4">
+                <a href="/create-event">Create Event</a>
+              </button>
               <button className="hover:bg-blue-500 mx-4">
                 <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
               </button>
@@ -52,9 +53,8 @@ export default function Navbar() {
         return (
           <div className="hidden md:flex gap-4 items-center basis-4/5">
             <div className="items-center w-3/4 text-center">
-              <button className="hover:bg-blue-500 mx-4">Find Events</button>
               <button className="hover:bg-blue-500 mx-4">
-                Find my Tickets
+                <a href="/my-tickets">My Tickets</a>
               </button>
               <button className="hover:bg-blue-500 mx-4">
                 <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
@@ -133,8 +133,10 @@ export default function Navbar() {
         return (
           <div className="flex flex-col p-4 text-center gap-4">
             <p>Welcome, {user.name}!</p>
-            <button className="hover:bg-blue-500 py-2">Find Events</button>
-            <button className="hover:bg-blue-500 py-2">Create Event</button>
+            <button className="hover:bg-blue-500 py-2">
+              {" "}
+              <a href="/create-event">Create Event</a>
+            </button>
             <button className="hover:bg-blue-500 mx-4">
               <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
             </button>
@@ -154,8 +156,7 @@ export default function Navbar() {
         return (
           <div className="flex flex-col p-4 text-center gap-4">
             <p>Welcome, {user.name}!</p>
-            <button className="hover:bg-blue-500 py-2">Find Events</button>
-            <button className="hover:bg-blue-500 py-2">Find my Tickets</button>
+            <button className="hover:bg-blue-500 py-2">My Tickets</button>
             <button className="hover:bg-blue-500 mx-4">
               <a href={`/profile/${userSlug(user.name)}`}>Profile</a>
             </button>

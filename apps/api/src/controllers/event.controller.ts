@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { User } from "../custom";
+import { PORT as port } from "../config/envConfig";
 
 const prisma = new PrismaClient();
+const PORT = Number(port) || 8000;
 
 async function CreateEvent(req: Request, res: Response, next: NextFunction) {
   try {
@@ -138,6 +140,7 @@ async function GetAllEvents(req: Request, res: Response, next: NextFunction) {
   try {
     const events = await prisma.event.findMany({
       select: {
+        id: true,
         name: true,
         createdBy: {
           select: {
@@ -158,9 +161,15 @@ async function GetAllEvents(req: Request, res: Response, next: NextFunction) {
         remainSeats: true,
       },
     });
+    const eventsWithBannerUrl = events.map((event) => ({
+      ...event,
+      bannerUrl: event.banner
+        ? `http://localhost:${PORT}/public/banner/${event.banner}`
+        : null,
+    }));
     res.status(200).send({
       message: "Success",
-      events,
+      events: eventsWithBannerUrl,
     });
   } catch (err) {
     next(err);
@@ -274,6 +283,7 @@ async function GetEventsByFilter(
     const events = await prisma.event.findMany({
       where: filters,
       select: {
+        id: true,
         name: true,
         createdBy: {
           select: {
@@ -290,11 +300,59 @@ async function GetEventsByFilter(
         },
         description: true,
         banner: true,
+        totalSeats: true,
+        remainSeats: true,
       },
     });
+    const eventsWithBannerUrl = events.map((event) => ({
+      ...event,
+      bannerUrl: event.banner
+        ? `http://localhost:${PORT}/public/banner/${event.banner}`
+        : null,
+    }));
     res.status(200).send({
       message: "Success",
-      events,
+      events: eventsWithBannerUrl,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function GetEvent(req: Request, res: Response, next: NextFunction) {
+  try {
+    const eventId = req.query.eventId as string;
+    const parseId = parseInt(eventId);
+    const findEvent = await prisma.event.findUnique({
+      where: { id: parseId },
+      select: {
+        id: true,
+        name: true,
+        createdBy: {
+          select: {
+            name: true,
+          },
+        },
+        price: true,
+        startDate: true,
+        startTime: true,
+        location: {
+          select: {
+            name: true,
+          },
+        },
+        description: true,
+        banner: true,
+        totalSeats: true,
+        remainSeats: true,
+      },
+    });
+    if (!findEvent) throw new Error("Event not found");
+    const bannerUrl = `http://localhost:${PORT}/public/banner/${findEvent.banner}`;
+    const eventWithBannerUrl = { ...findEvent, bannerUrl };
+    res.status(200).send({
+      message: "Success",
+      event: eventWithBannerUrl,
     });
   } catch (err) {
     next(err);
@@ -310,4 +368,5 @@ export {
   GetEventsByCategory,
   GetEventsByLoc,
   GetEventsByFilter,
+  GetEvent,
 };
